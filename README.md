@@ -20,7 +20,7 @@ This app provides a simple interface to save account credentials securely and la
 - Windows 10/11
 - [.NET 8 Desktop Runtime](https://dotnet.microsoft.com/en-us/download/dotnet/8.0)
 
-Alternatively, the project can be published as a self-contained executable that includes the runtime and has no external dependencies.
+Alternatively, the project can be downloaded from the releases page as a self-contained executable that includes the runtime and has no external dependencies.
 
 ---
 
