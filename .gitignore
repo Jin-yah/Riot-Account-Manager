@@ -1,0 +1,19 @@
+# C#/.NET
+
+## Visual Studio
+*.vs/
+*.suo
+*.user
+*.sln.docstates
+
+# Rider
+.idea/
+
+# Build results
+[Bb]in/
+[Oo]bj/
+publish/
+
+# Local files
+accounts.db
+*.log
