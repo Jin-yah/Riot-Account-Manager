@@ -1,28 +1,41 @@
+using LoLAccountLauncher.Services;
+
 namespace LoLAccountLauncher.Controls
 {
     /// <summary>
-    /// An overlay panel for entering or editing account credentials.
+    /// An overlay panel for configuring application settings.
     /// </summary>
-    public class AccountDetailsPanel : Panel
+    public class SettingsPanel : Panel
     {
-        private readonly TextBox usernameBox;
-        private readonly TextBox passwordBox;
+        private readonly TextBox riotClientPathBox;
         private readonly Button saveButton;
         private readonly Button cancelButton;
+        private readonly Button browseButton;
+        private readonly TextBox launchDelayBox;
 
         private Form? _parentForm;
         private IButtonControl? _originalAcceptButton;
         private IButtonControl? _originalCancelButton;
 
         /// <summary>
-        /// Gets the username entered by the user.
+        /// Gets the configured Riot Client executable path.
         /// </summary>
-        public string Username => usernameBox.Text;
+        public string RiotClientPath => riotClientPathBox.Text;
 
         /// <summary>
-        /// Gets the password entered by the user.
+        /// Gets the configured launch delay in milliseconds.
         /// </summary>
-        public string Password => passwordBox.Text;
+        public int LaunchDelayMs
+        {
+            get
+            {
+                if (int.TryParse(launchDelayBox.Text, out int delay))
+                {
+                    return delay;
+                }
+                return 3000; // Default value if parsing fails
+            }
+        }
 
         /// <summary>
         /// Occurs when the user clicks the Save button.
@@ -35,18 +48,18 @@ namespace LoLAccountLauncher.Controls
         public event EventHandler? CancelClicked;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="AccountDetailsPanel"/> class.
+        /// Initializes a new instance of the <see cref="SettingsPanel"/> class.
         /// </summary>
-        /// <param name="username">The initial username to display.</param>
-        /// <param name="password">The initial password to display.</param>
-        public AccountDetailsPanel(string username = "", string password = "")
+        public SettingsPanel()
         {
+            var settings = SettingsService.LoadSettings();
+
             SetStyle(ControlStyles.SupportsTransparentBackColor, true);
             this.BackColor = Color.Transparent;
 
             var container = new Panel
             {
-                Size = new Size(340, 220),
+                Size = new Size(400, 180),
                 BackColor = Color.FromArgb(62, 62, 66),
                 Anchor = AnchorStyles.None,
                 BorderStyle = BorderStyle.FixedSingle,
@@ -55,45 +68,61 @@ namespace LoLAccountLauncher.Controls
             this.Size = container.Size;
             container.Dock = DockStyle.Fill;
 
-            this.ParentChanged += AccountDetailsPanel_ParentChanged;
-            this.Disposed += AccountDetailsPanel_Disposed;
+            this.ParentChanged += SettingsPanel_ParentChanged;
+            this.Disposed += SettingsPanel_Disposed;
 
-            var userLabel = new Label
+            var pathLabel = new Label
             {
-                Text = "Username:",
+                Text = "Riot Client Path:",
                 Left = 20,
-                Top = 20,
-                Width = 80,
+                Top = 30,
+                Width = 120,
                 ForeColor = Color.FromArgb(241, 241, 241),
                 Font = new Font("Segoe UI", 9F),
             };
-            usernameBox = new TextBox
+
+            riotClientPathBox = new TextBox
             {
-                Left = 110,
-                Top = 20,
-                Width = 180,
-                Text = username,
+                Left = 20,
+                Top = 55,
+                Width = 275,
+                Text = settings.RiotClientPath,
                 BackColor = Color.FromArgb(62, 62, 66),
                 ForeColor = Color.FromArgb(241, 241, 241),
                 BorderStyle = BorderStyle.FixedSingle,
             };
 
-            var passLabel = new Label
+            browseButton = new Button
             {
-                Text = "Password:",
-                Left = 20,
-                Top = 60,
+                Text = "Browse...",
+                Left = 300,
+                Top = 54,
                 Width = 80,
+                Height = 24,
+                FlatStyle = FlatStyle.Flat,
+                ForeColor = Color.White,
+                BackColor = Color.FromArgb(82, 82, 82),
+                Font = new Font("Segoe UI", 8F, FontStyle.Bold),
+            };
+            browseButton.FlatAppearance.BorderSize = 0;
+            browseButton.Click += BrowseButton_Click;
+
+            var delayLabel = new Label
+            {
+                Text = "Launch Delay (ms):",
+                Left = 20,
+                Top = 90,
+                Width = 120,
                 ForeColor = Color.FromArgb(241, 241, 241),
                 Font = new Font("Segoe UI", 9F),
             };
-            passwordBox = new TextBox
+
+            launchDelayBox = new TextBox
             {
-                Left = 110,
-                Top = 60,
-                Width = 180,
-                Text = password,
-                UseSystemPasswordChar = true,
+                Left = 150,
+                Top = 90,
+                Width = 145,
+                Text = settings.LaunchDelayMs.ToString(),
                 BackColor = Color.FromArgb(62, 62, 66),
                 ForeColor = Color.FromArgb(241, 241, 241),
                 BorderStyle = BorderStyle.FixedSingle,
@@ -129,10 +158,11 @@ namespace LoLAccountLauncher.Controls
             cancelButton.FlatAppearance.BorderSize = 0;
             cancelButton.Click += (s, e) => CancelClicked?.Invoke(this, EventArgs.Empty);
 
-            container.Controls.Add(userLabel);
-            container.Controls.Add(usernameBox);
-            container.Controls.Add(passLabel);
-            container.Controls.Add(passwordBox);
+            container.Controls.Add(pathLabel);
+            container.Controls.Add(riotClientPathBox);
+            container.Controls.Add(browseButton);
+            container.Controls.Add(delayLabel);
+            container.Controls.Add(launchDelayBox);
             container.Controls.Add(saveButton);
             container.Controls.Add(cancelButton);
 
@@ -140,9 +170,29 @@ namespace LoLAccountLauncher.Controls
         }
 
         /// <summary>
+        /// Handles the click event for the browse button, opening a file dialog to select the Riot Client executable.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">An <see cref="EventArgs"/> that contains the event data.</param>
+        private void BrowseButton_Click(object? sender, EventArgs e)
+        {
+            using (var ofd = new OpenFileDialog())
+            {
+                ofd.Filter = "Executable Files (*.exe)|*.exe|All files (*.*)|*.*";
+                ofd.Title = "Select Riot Client Executable";
+                if (ofd.ShowDialog() == DialogResult.OK)
+                {
+                    riotClientPathBox.Text = ofd.FileName;
+                }
+            }
+        }
+
+        /// <summary>
         /// Handles the ParentChanged event to center the panel and manage form accept/cancel buttons.
         /// </summary>
-        private void AccountDetailsPanel_ParentChanged(object? sender, EventArgs e)
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">An <see cref="EventArgs"/> that contains the event data.</param>
+        private void SettingsPanel_ParentChanged(object? sender, EventArgs e)
         {
             if (this.Parent != null && _parentForm == null)
             {
@@ -173,7 +223,9 @@ namespace LoLAccountLauncher.Controls
         /// <summary>
         /// Handles the Disposed event to restore the original accept/cancel buttons on the parent form.
         /// </summary>
-        private void AccountDetailsPanel_Disposed(object? sender, EventArgs e)
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">An <see cref="EventArgs"/> that contains the event data.</param>
+        private void SettingsPanel_Disposed(object? sender, EventArgs e)
         {
             if (_parentForm != null && !_parentForm.IsDisposed)
             {

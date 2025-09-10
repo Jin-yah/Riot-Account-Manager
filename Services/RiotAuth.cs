@@ -85,25 +85,37 @@ namespace LoLAccountLauncher.Services
             if (Process.GetProcessesByName("Riot Client").Any())
                 return true;
 
-            string[] candidatePaths = new[]
-            {
-                "C:/Riot Games/Riot Client/RiotClientServices.exe",
-                Path.Combine(
-                    Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles),
-                    "Riot Games/Riot Client/RiotClientServices.exe"
-                ),
-                Path.Combine(
-                    Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86),
-                    "Riot Games/Riot Client/RiotClientServices.exe"
-                ),
-            };
+            var settings = SettingsService.LoadSettings();
+            string? exePath = null;
 
-            string? exePath = candidatePaths.FirstOrDefault(File.Exists);
+            if (
+                !string.IsNullOrEmpty(settings.RiotClientPath)
+                && File.Exists(settings.RiotClientPath)
+            )
+            {
+                exePath = settings.RiotClientPath;
+            }
+            else
+            {
+                string[] candidatePaths = new[]
+                {
+                    "C:/Riot Games/Riot Client/RiotClientServices.exe",
+                    Path.Combine(
+                        Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles),
+                        "Riot Games/Riot Client/RiotClientServices.exe"
+                    ),
+                    Path.Combine(
+                        Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86),
+                        "Riot Games/Riot Client/RiotClientServices.exe"
+                    ),
+                };
+                exePath = candidatePaths.FirstOrDefault(File.Exists);
+            }
 
             if (exePath == null)
             {
                 showNotification(
-                    "Could not find Riot Client executable. Please start it manually.",
+                    "Could not find Riot Client executable. Please set the path in Settings.",
                     NotificationType.Error
                 );
                 return false;
@@ -155,7 +167,8 @@ namespace LoLAccountLauncher.Services
 
             if (!clientWasAlreadyRunning)
             {
-                await Task.Delay(3000);
+                var settings = SettingsService.LoadSettings();
+                await Task.Delay(settings.LaunchDelayMs);
             }
 
             try

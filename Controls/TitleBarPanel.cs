@@ -17,6 +17,8 @@ namespace LoLAccountLauncher.Controls
         /// </summary>
         public const int HT_CAPTION = 0x2;
 
+        public event EventHandler? SettingsClicked;
+
         /// <summary>
         /// Sends the specified message to a window or windows.
         /// </summary>
@@ -77,7 +79,22 @@ namespace LoLAccountLauncher.Controls
             this.MouseDown += new MouseEventHandler(dragForm);
             titleLabel.MouseDown += new MouseEventHandler(dragForm);
 
+            var settingsButton = new Button
+            {
+                Text = "⚙", // Gear icon
+                Dock = DockStyle.Right,
+                Width = 45,
+                FlatStyle = FlatStyle.Flat,
+                ForeColor = Color.White,
+                BackColor = Color.FromArgb(37, 37, 38),
+                Font = new Font("Segoe UI", 10F),
+            };
+            settingsButton.FlatAppearance.BorderSize = 0;
+            settingsButton.FlatAppearance.MouseOverBackColor = Color.FromArgb(60, 60, 60);
+            settingsButton.Click += (s, e) => SettingsClicked?.Invoke(this, EventArgs.Empty);
+
             this.Controls.Add(titleLabel);
+            this.Controls.Add(settingsButton);
             this.Controls.Add(closeButton);
         }
 

@@ -12,7 +12,7 @@ namespace LoLAccountLauncher
     {
         private CustomScrollPanel? accountsPanel;
         private CustomScrollPanel? notificationContainer;
-        private Panel? titleBarPanel;
+        private TitleBarPanel? titleBarPanel;
         private Panel? addAccountButtonContainer;
         private Button? addAccountButton;
         private string dbPath;
@@ -23,6 +23,29 @@ namespace LoLAccountLauncher
         public Form1()
         {
             InitializeComponent();
+
+            // Prefer the executable's associated icon so the taskbar uses the same
+            // icon as the built exe. Fall back to the embedded resource if that
+            // fails (e.g., when running under the debugger with a different
+            // layout).
+            try
+            {
+                var exeIcon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
+                if (exeIcon != null)
+                    this.Icon = exeIcon;
+            }
+            catch
+            {
+                var assembly = System.Reflection.Assembly.GetExecutingAssembly();
+                var stream = assembly.GetManifestResourceStream("LoLAccountLauncher.icon.ico");
+                if (stream != null)
+                {
+                    using (stream)
+                    {
+                        this.Icon = new Icon(stream);
+                    }
+                }
+            }
 
             var appDataDir = Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
@@ -363,6 +386,46 @@ namespace LoLAccountLauncher
             ShowAccountDetailsOverlay(id, username, password, credentialKey);
         }
 
+        private void TitleBarPanel_SettingsClicked(object? sender, EventArgs e)
+        {
+            ShowSettingsOverlay();
+        }
+
+        private void ShowSettingsOverlay()
+        {
+            SetMainControlsEnabled(false);
+            var settingsPanel = new SettingsPanel();
+
+            Action closeOverlay = () =>
+            {
+                this.Controls.Remove(settingsPanel);
+                settingsPanel.Dispose();
+                SetMainControlsEnabled(true);
+                EnsureCorrectLayout();
+            };
+
+            settingsPanel.SaveClicked += (s, ev) =>
+            {
+                var newSettings = new AppSettings
+                {
+                    RiotClientPath = settingsPanel.RiotClientPath,
+                    LaunchDelayMs = settingsPanel.LaunchDelayMs,
+                };
+                SettingsService.SaveSettings(newSettings);
+
+                ShowNotification("Settings saved successfully.", NotificationType.Information);
+                closeOverlay();
+            };
+
+            settingsPanel.CancelClicked += (s, ev) =>
+            {
+                closeOverlay();
+            };
+
+            this.Controls.Add(settingsPanel);
+            settingsPanel.BringToFront();
+        }
+
         /// <summary>
         /// Deletes an account from the database and Windows Credential Manager after confirmation.
         /// </summary>
@@ -446,6 +509,7 @@ namespace LoLAccountLauncher
             this.BackColor = Color.FromArgb(45, 45, 48);
 
             titleBarPanel = new TitleBarPanel();
+            titleBarPanel.SettingsClicked += TitleBarPanel_SettingsClicked;
 
             notificationContainer = new CustomScrollPanel
             {
