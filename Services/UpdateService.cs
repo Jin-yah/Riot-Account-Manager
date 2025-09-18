@@ -1,4 +1,3 @@
-
 using System;
 using System.Net.Http;
 using System.Text.Json;
@@ -10,7 +9,8 @@ namespace LoLAccountLauncher.Services
     public class UpdateService
     {
         // IMPORTANT: Replace with your GitHub repository details
-                private const string GitHubApiUrl = "https://api.github.com/repos/Jin-yah/LoL-Account-Launcher/releases/latest";
+        private const string GitHubApiUrl =
+            "https://api.github.com/repos/Jin-yah/LoL-Account-Launcher/releases/latest";
         private const string CurrentVersion = "v1.0"; // Replace with your application's current version
 
         public async Task CheckForUpdates(Form1 mainForm)
@@ -47,11 +47,13 @@ namespace LoLAccountLauncher.Services
             Action onConfirm = () =>
             {
                 // Open the GitHub releases page in the default browser
-                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
-                {
-                    FileName = "https://github.com/Jin-yah/LoL-Account-Launcher/releases",
-                    UseShellExecute = true
-                });
+                System.Diagnostics.Process.Start(
+                    new System.Diagnostics.ProcessStartInfo
+                    {
+                        FileName = "https://github.com/Jin-yah/LoL-Account-Launcher/releases",
+                        UseShellExecute = true,
+                    }
+                );
             };
 
             var notification = new Controls.NotificationPanel(
