@@ -148,6 +148,24 @@ namespace LoLAccountLauncher.Services
             return false;
         }
 
+        private static void PasteFromClipboard(string text)
+        {
+            IDataObject? oldData = null;
+            try
+            {
+                oldData = Clipboard.GetDataObject();
+                Clipboard.SetText(text);
+                SendKeys.SendWait("^v");
+            }
+            finally
+            {
+                if (oldData != null)
+                {
+                    Clipboard.SetDataObject(oldData);
+                }
+            }
+        }
+
         /// <summary>
         /// Attempts to log into the Riot Client using UI automation.
         /// </summary>
@@ -212,7 +230,9 @@ namespace LoLAccountLauncher.Services
                 GetCursorPos(out POINT originalCursorPos);
 
                 SetForegroundWindow(windowHandle);
-                await Task.Delay(500);
+                await Task.Delay(100);
+                SetForegroundWindow(windowHandle);
+                await Task.Delay(100);
 
                 try
                 {
@@ -235,7 +255,7 @@ namespace LoLAccountLauncher.Services
 
                 SendKeys.SendWait("^{a}{DEL}");
                 await Task.Delay(100);
-                SendKeys.SendWait(username);
+                PasteFromClipboard(username);
 
                 await Task.Delay(100);
                 SendKeys.SendWait("{TAB}");
@@ -243,7 +263,7 @@ namespace LoLAccountLauncher.Services
 
                 SendKeys.SendWait("^{a}{DEL}");
                 await Task.Delay(100);
-                SendKeys.SendWait(password);
+                PasteFromClipboard(password);
 
                 await Task.Delay(200);
                 SendKeys.SendWait("{ENTER}");

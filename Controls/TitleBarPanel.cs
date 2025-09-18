@@ -18,6 +18,7 @@ namespace LoLAccountLauncher.Controls
         public const int HT_CAPTION = 0x2;
 
         public event EventHandler? SettingsClicked;
+        public event EventHandler? MinimizeClicked;
 
         /// <summary>
         /// Sends the specified message to a window or windows.
@@ -68,6 +69,20 @@ namespace LoLAccountLauncher.Controls
             closeButton.FlatAppearance.MouseOverBackColor = Color.FromArgb(192, 57, 43);
             closeButton.Click += (s, e) => this.FindForm()?.Close();
 
+            var minimizeButton = new Button
+            {
+                Text = "—",
+                Dock = DockStyle.Right,
+                Width = 45,
+                FlatStyle = FlatStyle.Flat,
+                ForeColor = Color.White,
+                BackColor = Color.FromArgb(37, 37, 38),
+                Font = new Font("Segoe UI", 10F),
+            };
+            minimizeButton.FlatAppearance.BorderSize = 0;
+            minimizeButton.FlatAppearance.MouseOverBackColor = Color.FromArgb(60, 60, 60);
+            minimizeButton.Click += (s, e) => MinimizeClicked?.Invoke(this, EventArgs.Empty);
+
             Action<object?, MouseEventArgs> dragForm = (s, e) =>
             {
                 if (e.Button == MouseButtons.Left && this.FindForm() is { } form)
@@ -95,6 +110,7 @@ namespace LoLAccountLauncher.Controls
 
             this.Controls.Add(titleLabel);
             this.Controls.Add(settingsButton);
+            this.Controls.Add(minimizeButton);
             this.Controls.Add(closeButton);
         }
 

@@ -125,8 +125,6 @@ namespace LoLAccountLauncher.Controls
             this.Controls.Add(messageLabel);
             this.Controls.Add(declineButton);
             this.Controls.Add(confirmButton);
-
-            InitializeAutoCloseTimer();
         }
 
         /// <summary>
@@ -134,7 +132,7 @@ namespace LoLAccountLauncher.Controls
         /// </summary>
         private void InitializeAutoCloseTimer()
         {
-            autoCloseTimer = new System.Windows.Forms.Timer { Interval = 10000 };
+            autoCloseTimer = new System.Windows.Forms.Timer { Interval = 1000 };
             autoCloseTimer.Tick += (sender, e) => this.Dispose();
             autoCloseTimer.Start();
         }

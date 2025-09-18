@@ -1,4 +1,3 @@
-using System.Reflection;
 using LoLAccountLauncher.Controls;
 using LoLAccountLauncher.Services;
 using Microsoft.Data.Sqlite;
@@ -54,36 +53,8 @@ namespace LoLAccountLauncher
             Directory.CreateDirectory(appDataDir);
             dbPath = Path.Combine(appDataDir, "accounts.db");
 
-            EnsureDatabaseFileExists();
             InitDatabase();
             LoadAccounts();
-        }
-
-        /// <summary>
-        /// Ensures the database file exists in the user's AppData folder, creating it from an embedded resource if necessary.
-        /// </summary>
-        private void EnsureDatabaseFileExists()
-        {
-            if (!File.Exists(dbPath))
-            {
-                var assembly = Assembly.GetExecutingAssembly();
-                using (
-                    var stream = assembly.GetManifestResourceStream(
-                        "LoLAccountLauncher.accounts.db"
-                    )
-                )
-                {
-                    if (stream == null)
-                    {
-                        MessageBox.Show("Critical error: Embedded database not found.");
-                        return;
-                    }
-                    using (var fileStream = new FileStream(dbPath, FileMode.CreateNew))
-                    {
-                        stream.CopyTo(fileStream);
-                    }
-                }
-            }
         }
 
         /// <summary>
@@ -190,7 +161,18 @@ namespace LoLAccountLauncher
                 {
                     if (s is not AccountListItem accountItem)
                         return;
-                    accountItem.Enabled = false;
+
+                    if (accountsPanel != null)
+                    {
+                        foreach (Control control in accountsPanel.ContentPanel.Controls)
+                        {
+                            if (control is AccountListItem item)
+                            {
+                                item.Enabled = false;
+                            }
+                        }
+                    }
+
                     try
                     {
                         string? password = CredentialManager.GetCredential(
@@ -214,8 +196,16 @@ namespace LoLAccountLauncher
                     }
                     finally
                     {
-                        if (!accountItem.IsDisposed)
-                            accountItem.Enabled = true;
+                        if (accountsPanel != null)
+                        {
+                            foreach (Control control in accountsPanel.ContentPanel.Controls)
+                            {
+                                if (control is AccountListItem item && !item.IsDisposed)
+                                {
+                                    item.Enabled = true;
+                                }
+                            }
+                        }
                     }
                 };
 
@@ -510,6 +500,7 @@ namespace LoLAccountLauncher
 
             titleBarPanel = new TitleBarPanel();
             titleBarPanel.SettingsClicked += TitleBarPanel_SettingsClicked;
+            titleBarPanel.MinimizeClicked += (s, e) => this.WindowState = FormWindowState.Minimized;
 
             notificationContainer = new CustomScrollPanel
             {
