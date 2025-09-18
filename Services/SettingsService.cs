@@ -17,6 +17,12 @@ namespace LoLAccountLauncher.Services
         /// Default is 3000ms (3 seconds).
         /// </summary>
         public int LaunchDelayMs { get; set; } = 3000; // Default to 3 seconds
+
+        /// <summary>
+        /// Gets or sets a value indicating whether to automatically check for updates.
+        /// Default is true.
+        /// </summary>
+        public bool CheckForUpdates { get; set; } = true;
     }
 
     /// <summary>

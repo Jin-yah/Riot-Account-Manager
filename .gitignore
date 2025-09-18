@@ -12,8 +12,10 @@
 # Build results
 [Bb]in/
 [Oo]bj/
+output/
 publish/
 
 # Local files
 accounts.db
 *.log
+*.iss

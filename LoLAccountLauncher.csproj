@@ -7,6 +7,11 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <ApplicationIcon>icon.ico</ApplicationIcon>
     <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <AssemblyName>LoLAccountLauncher</AssemblyName>
+    <Product>LoL Account Launcher</Product>
+    <Authors>Jinyah</Authors>
+    <Description>Small Windows app to switch Riot accounts; stores creds in Windows Credential Manager.</Description>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Data.Sqlite.Core" Version="9.0.8" />
@@ -18,7 +23,6 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <!-- Ensure the icon file is included in the project so MSBuild can embed it as the application icon -->
     <None Include="icon.ico" />
   </ItemGroup>
 </Project>

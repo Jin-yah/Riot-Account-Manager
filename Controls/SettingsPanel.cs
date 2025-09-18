@@ -12,6 +12,7 @@ namespace LoLAccountLauncher.Controls
         private readonly Button cancelButton;
         private readonly Button browseButton;
         private readonly TextBox launchDelayBox;
+        private readonly CheckBox checkForUpdatesBox;
 
         private Form? _parentForm;
         private IButtonControl? _originalAcceptButton;
@@ -37,6 +38,8 @@ namespace LoLAccountLauncher.Controls
             }
         }
 
+        public bool CheckForUpdates => checkForUpdatesBox.Checked;
+
         /// <summary>
         /// Occurs when the user clicks the Save button.
         /// </summary>
@@ -59,7 +62,7 @@ namespace LoLAccountLauncher.Controls
 
             var container = new Panel
             {
-                Size = new Size(400, 180),
+                Size = new Size(400, 210),
                 BackColor = Color.FromArgb(62, 62, 66),
                 Anchor = AnchorStyles.None,
                 BorderStyle = BorderStyle.FixedSingle,
@@ -128,11 +131,22 @@ namespace LoLAccountLauncher.Controls
                 BorderStyle = BorderStyle.FixedSingle,
             };
 
+            checkForUpdatesBox = new CheckBox
+            {
+                Text = "Automatically check for updates",
+                Left = 20,
+                Top = 120,
+                Width = 250,
+                Checked = settings.CheckForUpdates,
+                ForeColor = Color.FromArgb(241, 241, 241),
+                Font = new Font("Segoe UI", 9F),
+            };
+
             saveButton = new Button
             {
                 Text = "Save",
                 Left = 110,
-                Top = 120,
+                Top = 150,
                 Width = 85,
                 Height = 30,
                 FlatStyle = FlatStyle.Flat,
@@ -147,7 +161,7 @@ namespace LoLAccountLauncher.Controls
             {
                 Text = "Cancel",
                 Left = 205,
-                Top = 120,
+                Top = 150,
                 Width = 85,
                 Height = 30,
                 FlatStyle = FlatStyle.Flat,
@@ -163,6 +177,7 @@ namespace LoLAccountLauncher.Controls
             container.Controls.Add(browseButton);
             container.Controls.Add(delayLabel);
             container.Controls.Add(launchDelayBox);
+            container.Controls.Add(checkForUpdatesBox);
             container.Controls.Add(saveButton);
             container.Controls.Add(cancelButton);
 

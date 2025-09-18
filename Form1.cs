@@ -346,7 +346,7 @@ namespace LoLAccountLauncher
         /// Displays a pre-configured notification panel at the top of the window.
         /// </summary>
         /// <param name="notification">The notification panel to display.</param>
-        private void ShowNotification(NotificationPanel notification)
+        public void ShowNotification(NotificationPanel notification)
         {
             if (notificationContainer == null)
                 return;
@@ -400,6 +400,7 @@ namespace LoLAccountLauncher
                 {
                     RiotClientPath = settingsPanel.RiotClientPath,
                     LaunchDelayMs = settingsPanel.LaunchDelayMs,
+                    CheckForUpdates = settingsPanel.CheckForUpdates,
                 };
                 SettingsService.SaveSettings(newSettings);
 
@@ -562,7 +563,16 @@ namespace LoLAccountLauncher
             );
 
             this.Resize += (s, e) => UpdateNotificationContainerHeight();
-            this.Load += (s, e) => EnsureCorrectLayout();
+            this.Load += async (s, e) =>
+            {
+                EnsureCorrectLayout();
+                var settings = SettingsService.LoadSettings();
+                if (settings.CheckForUpdates)
+                {
+                    var updateService = new UpdateService();
+                    await updateService.CheckForUpdates(this);
+                }
+            };
         }
 
         /// <summary>
