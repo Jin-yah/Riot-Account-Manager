@@ -34,7 +34,7 @@ namespace LoLAccountLauncher.Controls
                 {
                     return delay;
                 }
-                return 3000; // Default value if parsing fails
+                return 3000;
             }
         }
 

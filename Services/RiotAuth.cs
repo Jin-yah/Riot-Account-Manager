@@ -232,7 +232,6 @@ namespace LoLAccountLauncher.Services
                 SetForegroundWindow(windowHandle);
                 await Task.Delay(100);
                 SetForegroundWindow(windowHandle);
-                await Task.Delay(100);
 
                 try
                 {

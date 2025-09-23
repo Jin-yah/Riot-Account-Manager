@@ -33,13 +33,13 @@ namespace LoLAccountLauncher
                 if (!createdNew)
                 {
                     // Another instance is already running
-                    IntPtr hWnd = FindWindow(string.Empty, "LoL Account Launcher"); // Find the window by its title
+                    IntPtr hWnd = FindWindow(string.Empty, "LoL Account Launcher");
                     if (hWnd != IntPtr.Zero)
                     {
-                        ShowWindow(hWnd, SW_RESTORE); // Restore if minimized
-                        SetForegroundWindow(hWnd); // Bring to front
+                        ShowWindow(hWnd, SW_RESTORE);
+                        SetForegroundWindow(hWnd);
                     }
-                    return; // Exit this instance
+                    return;
                 }
 
                 try

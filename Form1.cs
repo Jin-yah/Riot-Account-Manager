@@ -31,7 +31,7 @@ namespace LoLAccountLauncher
             {
                 var exeIcon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
                 if (exeIcon != null)
-                    this.Icon = exeIcon;
+                    Icon = exeIcon;
             }
             catch
             {
@@ -41,7 +41,7 @@ namespace LoLAccountLauncher
                 {
                     using (stream)
                     {
-                        this.Icon = new Icon(stream);
+                        Icon = new Icon(stream);
                     }
                 }
             }
@@ -162,6 +162,15 @@ namespace LoLAccountLauncher
                     if (s is not AccountListItem accountItem)
                         return;
 
+                    if (System.Diagnostics.Process.GetProcessesByName("LeagueClient").Any())
+                    {
+                        ShowNotification(
+                            "League of Legends is already running.",
+                            NotificationType.Error
+                        );
+                        return;
+                    }
+
                     if (accountsPanel != null)
                     {
                         foreach (Control control in accountsPanel.ContentPanel.Controls)
@@ -248,7 +257,7 @@ namespace LoLAccountLauncher
 
             Action closeOverlay = () =>
             {
-                this.Controls.Remove(detailsPanel);
+                Controls.Remove(detailsPanel);
                 detailsPanel.Dispose();
                 SetMainControlsEnabled(true);
                 EnsureCorrectLayout();
@@ -325,7 +334,7 @@ namespace LoLAccountLauncher
             {
                 closeOverlay();
             };
-            this.Controls.Add(detailsPanel);
+            Controls.Add(detailsPanel);
             detailsPanel.BringToFront();
         }
 
@@ -388,7 +397,7 @@ namespace LoLAccountLauncher
 
             Action closeOverlay = () =>
             {
-                this.Controls.Remove(settingsPanel);
+                Controls.Remove(settingsPanel);
                 settingsPanel.Dispose();
                 SetMainControlsEnabled(true);
                 EnsureCorrectLayout();
@@ -413,7 +422,7 @@ namespace LoLAccountLauncher
                 closeOverlay();
             };
 
-            this.Controls.Add(settingsPanel);
+            Controls.Add(settingsPanel);
             settingsPanel.BringToFront();
         }
 
@@ -483,8 +492,8 @@ namespace LoLAccountLauncher
                 notificationContainer.MaximumSize.Height
             );
             notificationContainer.Location = new Point(0, titleBarPanel?.Height ?? 32);
-            notificationContainer.Width = this.ClientSize.Width;
-            if (this.Controls.Contains(notificationContainer))
+            notificationContainer.Width = ClientSize.Width;
+            if (Controls.Contains(notificationContainer))
                 notificationContainer.BringToFront();
         }
 
@@ -493,15 +502,15 @@ namespace LoLAccountLauncher
         /// </summary>
         private void InitializeComponent()
         {
-            this.Text = "LoL Account Launcher";
-            this.Size = new Size(420, 600);
-            this.FormBorderStyle = FormBorderStyle.None;
-            this.MaximizeBox = false;
-            this.BackColor = Color.FromArgb(45, 45, 48);
+            Text = "LoL Account Launcher";
+            Size = new Size(420, 600);
+            FormBorderStyle = FormBorderStyle.None;
+            MaximizeBox = false;
+            BackColor = Color.FromArgb(45, 45, 48);
 
             titleBarPanel = new TitleBarPanel();
             titleBarPanel.SettingsClicked += TitleBarPanel_SettingsClicked;
-            titleBarPanel.MinimizeClicked += (s, e) => this.WindowState = FormWindowState.Minimized;
+            titleBarPanel.MinimizeClicked += (s, e) => WindowState = FormWindowState.Minimized;
 
             notificationContainer = new CustomScrollPanel
             {
@@ -526,7 +535,7 @@ namespace LoLAccountLauncher
                 Dock = DockStyle.Top,
                 Height = 55,
                 Padding = new Padding(10, 10, 10, 0),
-                BackColor = this.BackColor,
+                BackColor = BackColor,
             };
 
             addAccountButton = new Button
@@ -553,17 +562,11 @@ namespace LoLAccountLauncher
             accountsPanel.ContentPanel.DragDrop += AccountsPanel_DragDrop;
 
             Controls.AddRange(
-                new Control[]
-                {
-                    titleBarPanel,
-                    addAccountButtonContainer,
-                    accountsPanel,
-                    notificationContainer,
-                }
+                [titleBarPanel, addAccountButtonContainer, accountsPanel, notificationContainer]
             );
 
-            this.Resize += (s, e) => UpdateNotificationContainerHeight();
-            this.Load += async (s, e) =>
+            Resize += (s, e) => UpdateNotificationContainerHeight();
+            Load += async (s, e) =>
             {
                 EnsureCorrectLayout();
                 var settings = SettingsService.LoadSettings();

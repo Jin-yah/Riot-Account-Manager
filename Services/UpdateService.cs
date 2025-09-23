@@ -1,17 +1,12 @@
-using System;
-using System.Net.Http;
 using System.Text.Json;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 
 namespace LoLAccountLauncher.Services
 {
     public class UpdateService
     {
-        // IMPORTANT: Replace with your GitHub repository details
         private const string GitHubApiUrl =
             "https://api.github.com/repos/Jin-yah/LoL-Account-Launcher/releases/latest";
-        private const string CurrentVersion = "v1.3"; // Replace with your application's current version
+        private const string CurrentVersion = "v1.4";
 
         public async Task CheckForUpdates(Form1 mainForm)
         {
@@ -32,7 +27,6 @@ namespace LoLAccountLauncher.Services
             }
             catch (Exception ex)
             {
-                // Handle exceptions (e.g., no internet connection, GitHub API rate limit)
                 Console.WriteLine($"Error checking for updates: {ex.Message}");
             }
         }
