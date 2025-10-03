@@ -6,7 +6,7 @@ namespace LoLAccountLauncher.Services
     {
         private const string GitHubApiUrl =
             "https://api.github.com/repos/Jin-yah/LoL-Account-Launcher/releases/latest";
-        private const string CurrentVersion = "v1.4";
+        private const string CurrentVersion = "v1.5";
 
         public async Task CheckForUpdates(Form1 mainForm)
         {

@@ -42,6 +42,12 @@ namespace LoLAccountLauncher.Services
         );
 
         /// <summary>
+        /// Retrieves the handle to the foreground window (the window with which the user is currently working).
+        /// </summary>
+        [DllImport("user32.dll")]
+        private static extern IntPtr GetForegroundWindow();
+
+        /// <summary>
         /// Retrieves the position of the mouse cursor, in screen coordinates.
         /// </summary>
         [DllImport("user32.dll")]
@@ -230,41 +236,47 @@ namespace LoLAccountLauncher.Services
                 GetCursorPos(out POINT originalCursorPos);
 
                 SetForegroundWindow(windowHandle);
-                await Task.Delay(100);
-                SetForegroundWindow(windowHandle);
+                await Task.Delay(100); // Small delay to ensure window is focused
 
                 try
                 {
-                    int focusX = windowRect.Left + 100;
-                    int focusY = windowRect.Top + 100;
-                    SetCursorPos(focusX, focusY);
+                    int windowWidth = windowRect.Right - windowRect.Left;
+                    int windowHeight = windowRect.Bottom - windowRect.Top;
+
+                    // 13% of width, 30% of height from the top-left corner
+                    int targetX = windowRect.Left + (int)(windowWidth * 0.13);
+                    int targetY = windowRect.Top + (int)(windowHeight * 0.30);
+
+                    SetCursorPos(targetX, targetY);
                     mouse_event(MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_LEFTUP, 0, 0, 0, UIntPtr.Zero);
+                    await Task.Delay(50);
+                    mouse_event(MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_LEFTUP, 0, 0, 0, UIntPtr.Zero);
+                    await Task.Delay(100); // Wait for the click to register
                 }
                 finally
                 {
+                    // Restore original cursor position
                     SetCursorPos(originalCursorPos.X, originalCursorPos.Y);
                 }
-                await Task.Delay(200);
 
-                for (int i = 0; i < 3; i++)
+                // Check if Riot Client is the foreground window after the click
+                IntPtr foregroundWindowHandle = GetForegroundWindow();
+                if (foregroundWindowHandle != windowHandle)
                 {
-                    SendKeys.SendWait("{TAB}");
-                    await Task.Delay(50);
+                    showNotification(
+                        "Could not focus the Riot Client window. Login cancelled.",
+                        NotificationType.Error
+                    );
+                    return false;
                 }
 
-                SendKeys.SendWait("^{a}{DEL}");
-                await Task.Delay(100);
+                // Paste username, tab, then password
                 PasteFromClipboard(username);
-
                 await Task.Delay(100);
                 SendKeys.SendWait("{TAB}");
                 await Task.Delay(100);
-
-                SendKeys.SendWait("^{a}{DEL}");
-                await Task.Delay(100);
                 PasteFromClipboard(password);
-
-                await Task.Delay(200);
+                await Task.Delay(100);
                 SendKeys.SendWait("{ENTER}");
 
                 return true;
