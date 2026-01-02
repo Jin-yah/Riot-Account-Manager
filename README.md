@@ -1,6 +1,6 @@
 # LoL Account Launcher
 
-**GitHub Repository:** [https://github.com/YOUR_USERNAME/LoLAccountLauncher](https://github.com/YOUR_USERNAME/LoLAccountLauncher)
+**GitHub Repository:** [https://github.com/jin-yah/LoLAccountLauncher](https://github.com/jin-yah/LoLAccountLauncher)
 
 A lightweight Windows desktop application for managing and quickly logging into multiple League of Legends accounts.
 
