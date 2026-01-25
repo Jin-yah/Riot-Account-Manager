@@ -1,6 +1,6 @@
+using Microsoft.Data.Sqlite;
 using RiotAccountManager.Controls;
 using RiotAccountManager.Services;
-using Microsoft.Data.Sqlite;
 
 namespace RiotAccountManager
 {
@@ -57,7 +57,11 @@ namespace RiotAccountManager
             var oldDbPath = Path.Combine(oldAppDir, "accounts.db");
             if (File.Exists(oldDbPath) && !File.Exists(dbPath))
             {
-                try { File.Copy(oldDbPath, dbPath, overwrite: false); } catch { }
+                try
+                {
+                    File.Copy(oldDbPath, dbPath, overwrite: false);
+                }
+                catch { }
             }
 
             InitDatabase();
