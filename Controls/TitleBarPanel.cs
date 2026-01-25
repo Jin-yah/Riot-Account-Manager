@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 
-namespace LoLAccountLauncher.Controls
+namespace RiotAccountManager.Controls
 {
     /// <summary>
     /// A custom title bar panel with window dragging and a close button.

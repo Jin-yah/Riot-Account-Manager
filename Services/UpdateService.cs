@@ -1,11 +1,11 @@
 using System.Text.Json;
 
-namespace LoLAccountLauncher.Services
+namespace RiotAccountManager.Services
 {
     public class UpdateService
     {
         private const string GitHubApiUrl =
-            "https://api.github.com/repos/Jin-yah/LoL-Account-Launcher/releases/latest";
+            "https://api.github.com/repos/Jin-yah/Riot-Account-Manager/releases/latest";
         private const string CurrentVersion = "v1.5";
 
         public async Task CheckForUpdates(Form1 mainForm)
@@ -14,7 +14,7 @@ namespace LoLAccountLauncher.Services
             {
                 using (var client = new HttpClient())
                 {
-                    client.DefaultRequestHeaders.Add("User-Agent", "LoLAccountLauncher");
+                    client.DefaultRequestHeaders.Add("User-Agent", "RiotAccountManager");
                     var response = await client.GetStringAsync(GitHubApiUrl);
                     var release = JsonDocument.Parse(response).RootElement;
                     var latestVersion = release.GetProperty("tag_name").GetString();
@@ -44,7 +44,7 @@ namespace LoLAccountLauncher.Services
                 System.Diagnostics.Process.Start(
                     new System.Diagnostics.ProcessStartInfo
                     {
-                        FileName = "https://github.com/Jin-yah/LoL-Account-Launcher/releases",
+                        FileName = "https://github.com/Jin-yah/Riot-Account-Manager/releases",
                         UseShellExecute = true,
                     }
                 );

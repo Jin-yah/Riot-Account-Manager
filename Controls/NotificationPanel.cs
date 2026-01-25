@@ -1,4 +1,4 @@
-namespace LoLAccountLauncher.Controls
+namespace RiotAccountManager.Controls
 {
     /// <summary>
     /// Specifies the type of notification to display.

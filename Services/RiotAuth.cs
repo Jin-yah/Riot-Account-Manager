@@ -1,8 +1,8 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-using LoLAccountLauncher.Controls;
+using RiotAccountManager.Controls;
 
-namespace LoLAccountLauncher.Services
+namespace RiotAccountManager.Services
 {
     /// <summary>
     /// Handles authentication with the local Riot Client API.

@@ -1,4 +1,4 @@
-namespace LoLAccountLauncher.Controls
+namespace RiotAccountManager.Controls
 {
     /// <summary>
     /// A custom control representing a single account in the list.

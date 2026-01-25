@@ -7,8 +7,9 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <ApplicationIcon>icon.ico</ApplicationIcon>
     <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
-    <AssemblyName>LoLAccountLauncher</AssemblyName>
-    <Product>LoL Account Launcher</Product>
+    <AssemblyName>RiotAccountManager</AssemblyName>
+    <RootNamespace>RiotAccountManager</RootNamespace>
+    <Product>Riot Account Manager</Product>
     <Authors>Jinyah</Authors>
     <Description>Small Windows app to switch Riot accounts; stores creds in Windows Credential Manager.</Description>
     <ApplicationManifest>app.manifest</ApplicationManifest>

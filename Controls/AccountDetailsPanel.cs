@@ -1,4 +1,4 @@
-namespace LoLAccountLauncher.Controls
+namespace RiotAccountManager.Controls
 {
     /// <summary>
     /// An overlay panel for entering or editing account credentials.

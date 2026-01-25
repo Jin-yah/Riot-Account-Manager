@@ -1,4 +1,4 @@
-namespace LoLAccountLauncher.Controls
+namespace RiotAccountManager.Controls
 {
     /// <summary>
     /// A panel that provides a custom-styled, minimalistic scrollbar for its content.

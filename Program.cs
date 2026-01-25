@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 
-namespace LoLAccountLauncher
+namespace RiotAccountManager
 {
     /// <summary>
     /// The main entry point for the application.
@@ -27,13 +27,13 @@ namespace LoLAccountLauncher
         static void Main()
         {
             // Unique name for the mutex
-            string mutexName = "LoLAccountLauncherSingleInstanceMutex";
+            string mutexName = "RiotAccountManagerSingleInstanceMutex";
             using (Mutex mutex = new Mutex(true, mutexName, out bool createdNew))
             {
                 if (!createdNew)
                 {
                     // Another instance is already running
-                    IntPtr hWnd = FindWindow(string.Empty, "LoL Account Launcher");
+                    IntPtr hWnd = FindWindow(string.Empty, "Riot Account Manager");
                     if (hWnd != IntPtr.Zero)
                     {
                         ShowWindow(hWnd, SW_RESTORE);
@@ -53,7 +53,7 @@ namespace LoLAccountLauncher
                     File.WriteAllText(logPath, ex.ToString());
                     MessageBox.Show(
                         $"A critical error occurred and has been logged to:\n{logPath}\n\nError: {ex.Message}",
-                        "LoL Account Launcher - Error",
+                        "Riot Account Manager - Error",
                         MessageBoxButtons.OK,
                         MessageBoxIcon.Error
                     );
