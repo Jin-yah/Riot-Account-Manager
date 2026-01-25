@@ -1,17 +1,17 @@
 # LoL Account Launcher
 
-**GitHub Repository:** [https://github.com/jin-yah/LoLAccountLauncher](https://github.com/jin-yah/LoLAccountLauncher)
+**GitHub Repository:** [https://github.com/jin-yah/Riot-Account-Manager](https://github.com/jin-yah/Riot-Account-Manager)
 
-A lightweight Windows desktop application for managing and quickly logging into multiple League of Legends accounts.
+A lightweight Windows desktop application for managing and quickly logging into multiple Riot accounts.
 
-This app provides a simple interface to save account credentials securely and launch the League of Legends client with a single click, bypassing the need to manually enter your username and password.
+This app provides a simple interface to save account credentials securely and launch the Riot client with a single click, bypassing the need to manually enter your username and password.
 
 ---
 
 ## Features
 
-- **Multi-Account Management**: Save and organize multiple League of Legends accounts.
-- **One-Click Login**: Launch the League client and log in automatically.
+- **Multi-Account Management**: Save and organize multiple Riot accounts.
+- **One-Click Login**: Launch the Riot client and log in automatically.
 - **Secure Credential Storage**: Passwords are not stored by the application directly. Instead, they are saved securely in the **Windows Credential Manager**.
 - **Drag-and-Drop Reordering**: Easily reorder your account list to prioritize your most-used accounts.
 - **Enhanced Windows Integration**: Includes proper application metadata (Assembly/file info) and a Windows application manifest for better system integration and compatibility with antivirus heuristics.
@@ -34,7 +34,7 @@ Alternatively, the project can be downloaded from the releases page as a self-co
     - Enter the username and password.
     - Click "Save".
 2.  **Log In**:
-    - Click anywhere on the account item in the list. The launcher will attempt to log you into the League of Legends client.
+    - Click anywhere on the account item in the list. The launcher will attempt to log you into the Riot client.
 3.  **Edit/Delete**:
     - Hover over an account to reveal the "Edit" and "Delete" buttons.
 4.  **Reorder**:
@@ -48,9 +48,9 @@ Alternatively, the project can be downloaded from the releases page as a self-co
 
 - **Account Information**: Usernames and display names are stored in a local SQLite database located at:
   ```
-  %APPDATA%\\LoLAccountLauncher\\accounts.db
+  %APPDATA%\\RiotAccountManager\\accounts.db
   ```
-- **Passwords**: Passwords are saved as generic credentials in the Windows Credential Manager under a name like `LoLAccountLauncher_<GUID>`.
+- **Passwords**: Passwords are saved as generic credentials in the Windows Credential Manager under a name like `RiotAccountManager_<GUID>`.
 
 ---
 
@@ -62,4 +62,4 @@ MIT License — feel free to use, modify, and distribute.
 
 ## Disclaimer
 
-LoL Account Launcher is not endorsed by Riot Games and does not reflect the views or opinions of Riot Games or anyone officially involved in producing or managing Riot Games properties. Riot Games and all associated properties are trademarks or registered trademarks of Riot Games, Inc
+Riot Account Manager is not endorsed by Riot Games and does not reflect the views or opinions of Riot Games or anyone officially involved in producing or managing Riot Games properties. Riot Games and all associated properties are trademarks or registered trademarks of Riot Games, Inc
