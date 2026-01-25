@@ -1,6 +1,6 @@
 using System.Text.Json;
 
-namespace LoLAccountLauncher.Services
+namespace RiotAccountManager.Services
 {
     /// <summary>
     /// Represents the application settings.
@@ -39,12 +39,24 @@ namespace LoLAccountLauncher.Services
         /// </summary>
         static SettingsService()
         {
-            var appDataDir = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-                "LoLAccountLauncher"
-            );
-            Directory.CreateDirectory(appDataDir);
-            _settingsFilePath = Path.Combine(appDataDir, "settings.json");
+            var roaming = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            var oldAppDir = Path.Combine(roaming, "LoLAccountLauncher");
+            var newAppDir = Path.Combine(roaming, "RiotAccountManager");
+
+            if (!Directory.Exists(newAppDir))
+            {
+                Directory.CreateDirectory(newAppDir);
+            }
+
+            // Migrate settings.json from old folder if present and new doesn't have it
+            var oldSettings = Path.Combine(oldAppDir, "settings.json");
+            var newSettings = Path.Combine(newAppDir, "settings.json");
+            if (File.Exists(oldSettings) && !File.Exists(newSettings))
+            {
+                try { File.Copy(oldSettings, newSettings, overwrite: false); } catch { }
+            }
+
+            _settingsFilePath = newSettings;
         }
 
         /// <summary>

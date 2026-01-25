@@ -1,6 +1,6 @@
-using LoLAccountLauncher.Services;
+using RiotAccountManager.Services;
 
-namespace LoLAccountLauncher.Controls
+namespace RiotAccountManager.Controls
 {
     /// <summary>
     /// An overlay panel for configuring application settings.

@@ -2,7 +2,7 @@ using System.ComponentModel;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace LoLAccountLauncher.Services
+namespace RiotAccountManager.Services
 {
     /// <summary>
     /// A wrapper for the Windows Credential Manager API.

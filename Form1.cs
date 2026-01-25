@@ -1,8 +1,8 @@
-using LoLAccountLauncher.Controls;
-using LoLAccountLauncher.Services;
+using RiotAccountManager.Controls;
+using RiotAccountManager.Services;
 using Microsoft.Data.Sqlite;
 
-namespace LoLAccountLauncher
+namespace RiotAccountManager
 {
     /// <summary>
     /// The main window of the application.
@@ -36,7 +36,7 @@ namespace LoLAccountLauncher
             catch
             {
                 var assembly = System.Reflection.Assembly.GetExecutingAssembly();
-                var stream = assembly.GetManifestResourceStream("LoLAccountLauncher.icon.ico");
+                var stream = assembly.GetManifestResourceStream("RiotAccountManager.icon.ico");
                 if (stream != null)
                 {
                     using (stream)
@@ -46,12 +46,19 @@ namespace LoLAccountLauncher
                 }
             }
 
-            var appDataDir = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-                "LoLAccountLauncher"
-            );
-            Directory.CreateDirectory(appDataDir);
+            var roaming = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            var oldAppDir = Path.Combine(roaming, "LoLAccountLauncher");
+            var appDataDir = Path.Combine(roaming, "RiotAccountManager");
+            if (!Directory.Exists(appDataDir))
+            {
+                Directory.CreateDirectory(appDataDir);
+            }
             dbPath = Path.Combine(appDataDir, "accounts.db");
+            var oldDbPath = Path.Combine(oldAppDir, "accounts.db");
+            if (File.Exists(oldDbPath) && !File.Exists(dbPath))
+            {
+                try { File.Copy(oldDbPath, dbPath, overwrite: false); } catch { }
+            }
 
             InitDatabase();
             LoadAccounts();
@@ -310,7 +317,7 @@ namespace LoLAccountLauncher
                         newOrderIndex = Convert.ToInt32(orderCmd.ExecuteScalar());
                     }
 
-                    string newCredentialKey = "LoLAccountLauncher_" + Guid.NewGuid().ToString();
+                    string newCredentialKey = "RiotAccountManager_" + Guid.NewGuid().ToString();
                     CredentialManager.SaveCredential(newCredentialKey, newUsername, newPassword);
                     string sql =
                         "INSERT INTO accounts (username, credential_key, display_name, order_index) VALUES (@u, @c, @d, @o)";
@@ -502,7 +509,7 @@ namespace LoLAccountLauncher
         /// </summary>
         private void InitializeComponent()
         {
-            Text = "LoL Account Launcher";
+            Text = "Riot Account Manager";
             Size = new Size(420, 600);
             FormBorderStyle = FormBorderStyle.None;
             MaximizeBox = false;
