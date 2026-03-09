@@ -1,4 +1,4 @@
-# LoL Account Launcher
+# Riot Account Manager
 
 **GitHub Repository:** [https://github.com/jin-yah/Riot-Account-Manager](https://github.com/jin-yah/Riot-Account-Manager)
 
