@@ -1,4 +1,5 @@
 using System.Runtime.InteropServices;
+using RiotAccountManager.Services;
 
 namespace RiotAccountManager.Controls
 {
@@ -19,6 +20,27 @@ namespace RiotAccountManager.Controls
 
         public event EventHandler? SettingsClicked;
         public event EventHandler? MinimizeClicked;
+
+        private readonly Button closeButton;
+        private readonly Button minimizeButton;
+        private readonly Button settingsButton;
+        private readonly GameToggleSwitch gameToggleSwitch;
+        private RiotGameProduct selectedGame;
+
+        public event EventHandler? GameSelectionChanged;
+
+        public RiotGameProduct SelectedGame
+        {
+            get => selectedGame;
+            set
+            {
+                selectedGame = value;
+                if (gameToggleSwitch.SelectedGame != value)
+                {
+                    gameToggleSwitch.SelectedGame = value;
+                }
+            }
+        }
 
         /// <summary>
         /// Sends the specified message to a window or windows.
@@ -44,43 +66,39 @@ namespace RiotAccountManager.Controls
         {
             this.Dock = DockStyle.Top;
             this.Height = 32;
-            this.BackColor = Color.FromArgb(37, 37, 38);
+            this.BackColor = AppThemeManager.CurrentTheme.TitleBarBackground;
 
             titleLabel = new Label
             {
                 Dock = DockStyle.Fill,
-                ForeColor = Color.FromArgb(220, 220, 220),
+                ForeColor = AppThemeManager.CurrentTheme.PrimaryText,
                 TextAlign = ContentAlignment.MiddleLeft,
                 Font = new Font("Segoe UI", 9F, FontStyle.Bold),
                 Padding = new Padding(10, 0, 0, 0),
             };
 
-            var closeButton = new Button
+            closeButton = new Button
             {
                 Text = "✖",
                 Dock = DockStyle.Right,
                 Width = 45,
                 FlatStyle = FlatStyle.Flat,
                 ForeColor = Color.White,
-                BackColor = Color.FromArgb(37, 37, 38),
+                BackColor = this.BackColor,
                 Font = new Font("Segoe UI", 10F),
             };
-            closeButton.FlatAppearance.BorderSize = 0;
-            closeButton.FlatAppearance.MouseOverBackColor = Color.FromArgb(192, 57, 43);
             closeButton.Click += (s, e) => this.FindForm()?.Close();
 
-            var minimizeButton = new Button
+            minimizeButton = new Button
             {
                 Text = "—",
                 Dock = DockStyle.Right,
                 Width = 45,
                 FlatStyle = FlatStyle.Flat,
                 ForeColor = Color.White,
-                BackColor = Color.FromArgb(37, 37, 38),
+                BackColor = this.BackColor,
                 Font = new Font("Segoe UI", 10F),
             };
-            minimizeButton.FlatAppearance.BorderSize = 0;
-            minimizeButton.FlatAppearance.MouseOverBackColor = Color.FromArgb(60, 60, 60);
             minimizeButton.Click += (s, e) => MinimizeClicked?.Invoke(this, EventArgs.Empty);
 
             Action<object?, MouseEventArgs> dragForm = (s, e) =>
@@ -94,24 +112,72 @@ namespace RiotAccountManager.Controls
             this.MouseDown += new MouseEventHandler(dragForm);
             titleLabel.MouseDown += new MouseEventHandler(dragForm);
 
-            var settingsButton = new Button
+            settingsButton = new Button
             {
                 Text = "⚙", // Gear icon
                 Dock = DockStyle.Right,
                 Width = 45,
                 FlatStyle = FlatStyle.Flat,
                 ForeColor = Color.White,
-                BackColor = Color.FromArgb(37, 37, 38),
+                BackColor = this.BackColor,
                 Font = new Font("Segoe UI", 10F),
             };
-            settingsButton.FlatAppearance.BorderSize = 0;
-            settingsButton.FlatAppearance.MouseOverBackColor = Color.FromArgb(60, 60, 60);
             settingsButton.Click += (s, e) => SettingsClicked?.Invoke(this, EventArgs.Empty);
 
+            var toggleHost = new Panel
+            {
+                Dock = DockStyle.Right,
+                Width = 76,
+                Padding = new Padding(6, 4, 6, 4),
+                BackColor = this.BackColor,
+            };
+
+            gameToggleSwitch = new GameToggleSwitch
+            {
+                Dock = DockStyle.Fill,
+            };
+            gameToggleSwitch.SelectedGameChanged += (s, e) =>
+            {
+                selectedGame = gameToggleSwitch.SelectedGame;
+                GameSelectionChanged?.Invoke(this, EventArgs.Empty);
+            };
+            toggleHost.Controls.Add(gameToggleSwitch);
+
+            SelectedGame = RiotGameProduct.LeagueOfLegends;
+            ApplyTheme(AppThemeManager.CurrentTheme);
+
             this.Controls.Add(titleLabel);
+            this.Controls.Add(toggleHost);
             this.Controls.Add(settingsButton);
             this.Controls.Add(minimizeButton);
             this.Controls.Add(closeButton);
+        }
+
+        public void ApplyTheme(AppTheme theme)
+        {
+            BackColor = theme.TitleBarBackground;
+            titleLabel.ForeColor = theme.PrimaryText;
+            closeButton.BackColor = theme.TitleBarBackground;
+            closeButton.FlatAppearance.BorderSize = 0;
+            closeButton.FlatAppearance.MouseOverBackColor = theme.DangerAccent;
+            closeButton.FlatAppearance.MouseDownBackColor = theme.DangerAccentPressed;
+            minimizeButton.BackColor = theme.TitleBarBackground;
+            minimizeButton.FlatAppearance.BorderSize = 0;
+            minimizeButton.FlatAppearance.MouseOverBackColor = theme.SurfaceBackground;
+            minimizeButton.FlatAppearance.MouseDownBackColor = theme.SurfaceHoverBackground;
+            settingsButton.BackColor = theme.TitleBarBackground;
+            settingsButton.FlatAppearance.BorderSize = 0;
+            settingsButton.FlatAppearance.MouseOverBackColor = theme.SurfaceBackground;
+            settingsButton.FlatAppearance.MouseDownBackColor = theme.SurfaceHoverBackground;
+            gameToggleSwitch.Theme = theme;
+            foreach (Control control in Controls)
+            {
+                if (control is Panel panel)
+                {
+                    panel.BackColor = theme.TitleBarBackground;
+                }
+            }
+            Invalidate();
         }
 
         /// <summary>

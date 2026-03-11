@@ -1,3 +1,5 @@
+using RiotAccountManager.Services;
+
 namespace RiotAccountManager.Controls
 {
     /// <summary>
@@ -9,6 +11,9 @@ namespace RiotAccountManager.Controls
         private readonly TextBox passwordBox;
         private readonly Button saveButton;
         private readonly Button cancelButton;
+        private readonly Panel container;
+        private readonly Label userLabel;
+        private readonly Label passLabel;
 
         private Form? _parentForm;
         private IButtonControl? _originalAcceptButton;
@@ -39,15 +44,18 @@ namespace RiotAccountManager.Controls
         /// </summary>
         /// <param name="username">The initial username to display.</param>
         /// <param name="password">The initial password to display.</param>
-        public AccountDetailsPanel(string username = "", string password = "")
+        public AccountDetailsPanel(
+            string username = "",
+            string password = "",
+            AppTheme? theme = null
+        )
         {
             SetStyle(ControlStyles.SupportsTransparentBackColor, true);
             this.BackColor = Color.Transparent;
 
-            var container = new Panel
+            container = new Panel
             {
                 Size = new Size(340, 220),
-                BackColor = Color.FromArgb(62, 62, 66),
                 Anchor = AnchorStyles.None,
                 BorderStyle = BorderStyle.FixedSingle,
                 Visible = true,
@@ -58,13 +66,12 @@ namespace RiotAccountManager.Controls
             this.ParentChanged += AccountDetailsPanel_ParentChanged;
             this.Disposed += AccountDetailsPanel_Disposed;
 
-            var userLabel = new Label
+            userLabel = new Label
             {
                 Text = "Username:",
                 Left = 20,
                 Top = 20,
                 Width = 80,
-                ForeColor = Color.FromArgb(241, 241, 241),
                 Font = new Font("Segoe UI", 9F),
             };
             usernameBox = new TextBox
@@ -73,18 +80,15 @@ namespace RiotAccountManager.Controls
                 Top = 20,
                 Width = 180,
                 Text = username,
-                BackColor = Color.FromArgb(62, 62, 66),
-                ForeColor = Color.FromArgb(241, 241, 241),
                 BorderStyle = BorderStyle.FixedSingle,
             };
 
-            var passLabel = new Label
+            passLabel = new Label
             {
                 Text = "Password:",
                 Left = 20,
                 Top = 60,
                 Width = 80,
-                ForeColor = Color.FromArgb(241, 241, 241),
                 Font = new Font("Segoe UI", 9F),
             };
             passwordBox = new TextBox
@@ -94,8 +98,6 @@ namespace RiotAccountManager.Controls
                 Width = 180,
                 Text = password,
                 UseSystemPasswordChar = true,
-                BackColor = Color.FromArgb(62, 62, 66),
-                ForeColor = Color.FromArgb(241, 241, 241),
                 BorderStyle = BorderStyle.FixedSingle,
             };
 
@@ -107,11 +109,8 @@ namespace RiotAccountManager.Controls
                 Width = 85,
                 Height = 30,
                 FlatStyle = FlatStyle.Flat,
-                ForeColor = Color.White,
-                BackColor = Color.FromArgb(0, 122, 204),
                 Font = new Font("Segoe UI", 9F, FontStyle.Bold),
             };
-            saveButton.FlatAppearance.BorderSize = 0;
             saveButton.Click += (s, e) => SaveClicked?.Invoke(this, EventArgs.Empty);
 
             cancelButton = new Button
@@ -122,11 +121,8 @@ namespace RiotAccountManager.Controls
                 Width = 85,
                 Height = 30,
                 FlatStyle = FlatStyle.Flat,
-                ForeColor = Color.White,
-                BackColor = Color.FromArgb(82, 82, 82),
                 Font = new Font("Segoe UI", 9F, FontStyle.Bold),
             };
-            cancelButton.FlatAppearance.BorderSize = 0;
             cancelButton.Click += (s, e) => CancelClicked?.Invoke(this, EventArgs.Empty);
 
             container.Controls.Add(userLabel);
@@ -137,6 +133,19 @@ namespace RiotAccountManager.Controls
             container.Controls.Add(cancelButton);
 
             this.Controls.Add(container);
+
+            ApplyTheme(theme ?? AppThemeManager.CurrentTheme);
+        }
+
+        public void ApplyTheme(AppTheme theme)
+        {
+            container.BackColor = theme.SurfaceBackground;
+            userLabel.ForeColor = theme.PrimaryText;
+            passLabel.ForeColor = theme.PrimaryText;
+            ThemeStyler.ApplyInput(usernameBox, theme);
+            ThemeStyler.ApplyInput(passwordBox, theme);
+            ThemeStyler.ApplyPrimaryButton(saveButton, theme);
+            ThemeStyler.ApplyNeutralButton(cancelButton, theme);
         }
 
         /// <summary>

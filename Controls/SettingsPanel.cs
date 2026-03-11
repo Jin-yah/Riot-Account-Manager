@@ -13,6 +13,9 @@ namespace RiotAccountManager.Controls
         private readonly Button browseButton;
         private readonly TextBox launchDelayBox;
         private readonly CheckBox checkForUpdatesBox;
+        private readonly Panel container;
+        private readonly Label pathLabel;
+        private readonly Label delayLabel;
 
         private Form? _parentForm;
         private IButtonControl? _originalAcceptButton;
@@ -53,17 +56,16 @@ namespace RiotAccountManager.Controls
         /// <summary>
         /// Initializes a new instance of the <see cref="SettingsPanel"/> class.
         /// </summary>
-        public SettingsPanel()
+        public SettingsPanel(AppTheme? theme = null)
         {
             var settings = SettingsService.LoadSettings();
 
             SetStyle(ControlStyles.SupportsTransparentBackColor, true);
             this.BackColor = Color.Transparent;
 
-            var container = new Panel
+            container = new Panel
             {
                 Size = new Size(400, 210),
-                BackColor = Color.FromArgb(62, 62, 66),
                 Anchor = AnchorStyles.None,
                 BorderStyle = BorderStyle.FixedSingle,
                 Visible = true,
@@ -74,13 +76,12 @@ namespace RiotAccountManager.Controls
             this.ParentChanged += SettingsPanel_ParentChanged;
             this.Disposed += SettingsPanel_Disposed;
 
-            var pathLabel = new Label
+            pathLabel = new Label
             {
                 Text = "Riot Client Path:",
                 Left = 20,
                 Top = 30,
                 Width = 120,
-                ForeColor = Color.FromArgb(241, 241, 241),
                 Font = new Font("Segoe UI", 9F),
             };
 
@@ -90,8 +91,6 @@ namespace RiotAccountManager.Controls
                 Top = 55,
                 Width = 275,
                 Text = settings.RiotClientPath,
-                BackColor = Color.FromArgb(62, 62, 66),
-                ForeColor = Color.FromArgb(241, 241, 241),
                 BorderStyle = BorderStyle.FixedSingle,
             };
 
@@ -103,20 +102,16 @@ namespace RiotAccountManager.Controls
                 Width = 80,
                 Height = 24,
                 FlatStyle = FlatStyle.Flat,
-                ForeColor = Color.White,
-                BackColor = Color.FromArgb(82, 82, 82),
                 Font = new Font("Segoe UI", 8F, FontStyle.Bold),
             };
-            browseButton.FlatAppearance.BorderSize = 0;
             browseButton.Click += BrowseButton_Click;
 
-            var delayLabel = new Label
+            delayLabel = new Label
             {
                 Text = "Launch Delay (ms):",
                 Left = 20,
                 Top = 90,
                 Width = 120,
-                ForeColor = Color.FromArgb(241, 241, 241),
                 Font = new Font("Segoe UI", 9F),
             };
 
@@ -126,8 +121,6 @@ namespace RiotAccountManager.Controls
                 Top = 90,
                 Width = 145,
                 Text = settings.LaunchDelayMs.ToString(),
-                BackColor = Color.FromArgb(62, 62, 66),
-                ForeColor = Color.FromArgb(241, 241, 241),
                 BorderStyle = BorderStyle.FixedSingle,
             };
 
@@ -138,7 +131,6 @@ namespace RiotAccountManager.Controls
                 Top = 120,
                 Width = 250,
                 Checked = settings.CheckForUpdates,
-                ForeColor = Color.FromArgb(241, 241, 241),
                 Font = new Font("Segoe UI", 9F),
             };
 
@@ -150,11 +142,8 @@ namespace RiotAccountManager.Controls
                 Width = 85,
                 Height = 30,
                 FlatStyle = FlatStyle.Flat,
-                ForeColor = Color.White,
-                BackColor = Color.FromArgb(0, 122, 204),
                 Font = new Font("Segoe UI", 9F, FontStyle.Bold),
             };
-            saveButton.FlatAppearance.BorderSize = 0;
             saveButton.Click += (s, e) => SaveClicked?.Invoke(this, EventArgs.Empty);
 
             cancelButton = new Button
@@ -165,11 +154,8 @@ namespace RiotAccountManager.Controls
                 Width = 85,
                 Height = 30,
                 FlatStyle = FlatStyle.Flat,
-                ForeColor = Color.White,
-                BackColor = Color.FromArgb(82, 82, 82),
                 Font = new Font("Segoe UI", 9F, FontStyle.Bold),
             };
-            cancelButton.FlatAppearance.BorderSize = 0;
             cancelButton.Click += (s, e) => CancelClicked?.Invoke(this, EventArgs.Empty);
 
             container.Controls.Add(pathLabel);
@@ -182,6 +168,21 @@ namespace RiotAccountManager.Controls
             container.Controls.Add(cancelButton);
 
             this.Controls.Add(container);
+
+            ApplyTheme(theme ?? AppThemeManager.CurrentTheme);
+        }
+
+        public void ApplyTheme(AppTheme theme)
+        {
+            container.BackColor = theme.SurfaceBackground;
+            pathLabel.ForeColor = theme.PrimaryText;
+            delayLabel.ForeColor = theme.PrimaryText;
+            checkForUpdatesBox.ForeColor = theme.PrimaryText;
+            ThemeStyler.ApplyInput(riotClientPathBox, theme);
+            ThemeStyler.ApplyInput(launchDelayBox, theme);
+            ThemeStyler.ApplyNeutralButton(browseButton, theme);
+            ThemeStyler.ApplyPrimaryButton(saveButton, theme);
+            ThemeStyler.ApplyNeutralButton(cancelButton, theme);
         }
 
         /// <summary>

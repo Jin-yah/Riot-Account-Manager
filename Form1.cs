@@ -14,6 +14,7 @@ namespace RiotAccountManager
         private TitleBarPanel? titleBarPanel;
         private Panel? addAccountButtonContainer;
         private Button? addAccountButton;
+        private RiotGameProduct selectedGame = RiotGameProduct.LeagueOfLegends;
         private string dbPath;
 
         /// <summary>
@@ -21,6 +22,9 @@ namespace RiotAccountManager
         /// </summary>
         public Form1()
         {
+            var settings = SettingsService.LoadSettings();
+            selectedGame = settings.SelectedGame;
+            AppThemeManager.SetGame(selectedGame);
             InitializeComponent();
 
             // Prefer the executable's associated icon so the taskbar uses the same
@@ -66,6 +70,7 @@ namespace RiotAccountManager
 
             InitDatabase();
             LoadAccounts();
+            ApplyTheme();
         }
 
         /// <summary>
@@ -173,10 +178,10 @@ namespace RiotAccountManager
                     if (s is not AccountListItem accountItem)
                         return;
 
-                    if (System.Diagnostics.Process.GetProcessesByName("LeagueClient").Any())
+                    if (selectedGame.IsGameRunning())
                     {
                         ShowNotification(
-                            "League of Legends is already running.",
+                            selectedGame.GetAlreadyRunningMessage(),
                             NotificationType.Error
                         );
                         return;
@@ -209,6 +214,7 @@ namespace RiotAccountManager
                         bool ok = await RiotAuth.LoginAsync(
                             accountItem.Username,
                             password,
+                            selectedGame,
                             ShowNotification
                         );
                         if (ok)
@@ -264,7 +270,11 @@ namespace RiotAccountManager
         )
         {
             SetMainControlsEnabled(false);
-            var detailsPanel = new AccountDetailsPanel(username, password);
+            var detailsPanel = new AccountDetailsPanel(
+                username,
+                password,
+                AppThemeManager.CurrentTheme
+            );
 
             Action closeOverlay = () =>
             {
@@ -401,10 +411,23 @@ namespace RiotAccountManager
             ShowSettingsOverlay();
         }
 
+        private void TitleBarPanel_GameToggleClicked(object? sender, EventArgs e)
+        {
+            if (titleBarPanel == null)
+                return;
+
+            selectedGame = titleBarPanel.SelectedGame;
+            AppThemeManager.SetGame(selectedGame);
+            var settings = SettingsService.LoadSettings();
+            settings.SelectedGame = selectedGame;
+            SettingsService.SaveSettings(settings);
+            ApplyTheme();
+        }
+
         private void ShowSettingsOverlay()
         {
             SetMainControlsEnabled(false);
-            var settingsPanel = new SettingsPanel();
+            var settingsPanel = new SettingsPanel(AppThemeManager.CurrentTheme!);
 
             Action closeOverlay = () =>
             {
@@ -421,6 +444,7 @@ namespace RiotAccountManager
                     RiotClientPath = settingsPanel.RiotClientPath,
                     LaunchDelayMs = settingsPanel.LaunchDelayMs,
                     CheckForUpdates = settingsPanel.CheckForUpdates,
+                    SelectedGame = selectedGame,
                 };
                 SettingsService.SaveSettings(newSettings);
 
@@ -517,10 +541,12 @@ namespace RiotAccountManager
             Size = new Size(420, 600);
             FormBorderStyle = FormBorderStyle.None;
             MaximizeBox = false;
-            BackColor = Color.FromArgb(45, 45, 48);
+            BackColor = AppThemeManager.CurrentTheme.WindowBackground;
 
             titleBarPanel = new TitleBarPanel();
             titleBarPanel.SettingsClicked += TitleBarPanel_SettingsClicked;
+            titleBarPanel.GameSelectionChanged += TitleBarPanel_GameToggleClicked;
+            titleBarPanel.SelectedGame = selectedGame;
             titleBarPanel.MinimizeClicked += (s, e) => WindowState = FormWindowState.Minimized;
 
             notificationContainer = new CustomScrollPanel
@@ -555,15 +581,16 @@ namespace RiotAccountManager
                 Dock = DockStyle.Fill,
                 Height = 45,
                 FlatStyle = FlatStyle.Flat,
-                BackColor = Color.FromArgb(0, 122, 204),
-                ForeColor = Color.White,
                 Font = new Font("Segoe UI", 10F, FontStyle.Bold),
             };
 
-            addAccountButton.FlatAppearance.BorderSize = 0;
             addAccountButton.Click += AddAccountButton_Click;
             addAccountButtonContainer.Controls.Add(addAccountButton);
-            accountsPanel = new CustomScrollPanel { Dock = DockStyle.Fill };
+            accountsPanel = new CustomScrollPanel
+            {
+                Dock = DockStyle.Fill,
+                BackColor = AppThemeManager.CurrentTheme.WindowBackground,
+            };
             accountsPanel.ContentPanel.Padding = new Padding(5);
             accountsPanel.MaximumSize = new Size(420, 505);
 
@@ -580,6 +607,7 @@ namespace RiotAccountManager
             Load += async (s, e) =>
             {
                 EnsureCorrectLayout();
+                ApplyTheme();
                 var settings = SettingsService.LoadSettings();
                 if (settings.CheckForUpdates)
                 {
@@ -668,6 +696,66 @@ namespace RiotAccountManager
                     cmd.ExecuteNonQuery();
                 }
             }
+        }
+
+        private void ApplyTheme()
+        {
+            var theme = AppThemeManager.CurrentTheme;
+
+            BackColor = theme.WindowBackground;
+
+            if (titleBarPanel != null)
+            {
+                titleBarPanel.ApplyTheme(theme);
+            }
+
+            if (addAccountButtonContainer != null)
+            {
+                addAccountButtonContainer.BackColor = theme.WindowBackground;
+            }
+
+            if (addAccountButton != null)
+            {
+                ThemeStyler.ApplyPrimaryButton(addAccountButton, theme);
+            }
+
+            if (accountsPanel != null)
+            {
+                accountsPanel.BackColor = theme.WindowBackground;
+                foreach (Control control in accountsPanel.ContentPanel.Controls)
+                {
+                    if (control is AccountListItem item)
+                    {
+                        item.ApplyTheme(theme);
+                    }
+                }
+            }
+
+            if (notificationContainer != null)
+            {
+                foreach (Control control in notificationContainer.ContentPanel.Controls)
+                {
+                    if (control is NotificationPanel panel)
+                    {
+                        panel.ApplyTheme(theme);
+                    }
+                }
+            }
+
+            foreach (Control control in Controls)
+            {
+                if (control is SettingsPanel settingsPanel)
+                {
+                    settingsPanel.ApplyTheme(theme);
+                }
+
+                if (control is AccountDetailsPanel detailsPanel)
+                {
+                    detailsPanel.ApplyTheme(theme);
+                }
+            }
+
+            Invalidate(true);
         }
     }
 }

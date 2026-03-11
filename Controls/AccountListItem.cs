@@ -1,3 +1,5 @@
+using RiotAccountManager.Services;
+
 namespace RiotAccountManager.Controls
 {
     /// <summary>
@@ -49,8 +51,11 @@ namespace RiotAccountManager.Controls
         private readonly System.Windows.Forms.Timer animationTimer;
         private DateTime animationStart;
         private bool isHovering = false;
-        private readonly Color startColor = Color.FromArgb(62, 62, 66);
-        private readonly Color hoverColor = Color.FromArgb(82, 82, 86);
+        private Color startColor = AppThemeManager.CurrentTheme.SurfaceBackground;
+        private Color hoverColor = AppThemeManager.CurrentTheme.SurfaceHoverBackground;
+        private Color actionButtonColor = AppThemeManager.CurrentTheme.MutedText;
+        private Color editHoverColor = AppThemeManager.CurrentTheme.PrimaryText;
+        private Color deleteHoverColor = AppThemeManager.CurrentTheme.DangerAccentHover;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AccountListItem"/> class.
@@ -102,28 +107,36 @@ namespace RiotAccountManager.Controls
 
             editBtn = new Button
             {
-                Text = "Edit",
+                Text = "✎",
                 Dock = DockStyle.Right,
-                Width = 65,
+                Width = 40,
                 FlatStyle = FlatStyle.Flat,
-                ForeColor = Color.White,
-                BackColor = Color.FromArgb(0, 90, 158),
-                Font = new Font("Segoe UI", 9F),
+                Font = new Font("Segoe UI Symbol", 14F),
+                BackColor = Color.Transparent,
+                TabStop = false,
+                Cursor = Cursors.Hand,
+                TextAlign = ContentAlignment.MiddleCenter,
             };
             editBtn.FlatAppearance.BorderSize = 0;
+            editBtn.FlatAppearance.MouseOverBackColor = Color.Transparent;
+            editBtn.FlatAppearance.MouseDownBackColor = Color.Transparent;
             editBtn.Visible = false;
 
             deleteBtn = new Button
             {
-                Text = "Delete",
+                Text = "🗑",
                 Dock = DockStyle.Right,
-                Width = 65,
+                Width = 40,
                 FlatStyle = FlatStyle.Flat,
-                ForeColor = Color.White,
-                BackColor = Color.FromArgb(179, 57, 57),
-                Font = new Font("Segoe UI", 9F),
+                Font = new Font("Segoe UI Symbol", 14F),
+                BackColor = Color.Transparent,
+                TabStop = false,
+                Cursor = Cursors.Hand,
+                TextAlign = ContentAlignment.MiddleCenter,
             };
             deleteBtn.FlatAppearance.BorderSize = 0;
+            deleteBtn.FlatAppearance.MouseOverBackColor = Color.Transparent;
+            deleteBtn.FlatAppearance.MouseDownBackColor = Color.Transparent;
             deleteBtn.Visible = false;
 
             dragHandle.MouseDown += (s, e) =>
@@ -166,6 +179,10 @@ namespace RiotAccountManager.Controls
             usernameLabel.MouseEnter += new EventHandler(enterAction);
             editBtn.MouseEnter += new EventHandler(enterAction);
             deleteBtn.MouseEnter += new EventHandler(enterAction);
+            editBtn.MouseEnter += (s, e) => editBtn.ForeColor = editHoverColor;
+            editBtn.MouseLeave += (s, e) => editBtn.ForeColor = actionButtonColor;
+            deleteBtn.MouseEnter += (s, e) => deleteBtn.ForeColor = deleteHoverColor;
+            deleteBtn.MouseLeave += (s, e) => deleteBtn.ForeColor = actionButtonColor;
 
             this.MouseLeave += new EventHandler(leaveAction);
             usernameLabel.MouseLeave += new EventHandler(leaveAction);
@@ -181,6 +198,22 @@ namespace RiotAccountManager.Controls
             this.Controls.Add(usernameLabel);
             this.Controls.Add(editBtn);
             this.Controls.Add(deleteBtn);
+
+            ApplyTheme(AppThemeManager.CurrentTheme);
+        }
+
+        public void ApplyTheme(AppTheme theme)
+        {
+            startColor = theme.SurfaceBackground;
+            hoverColor = theme.SurfaceHoverBackground;
+            actionButtonColor = theme.MutedText;
+            editHoverColor = theme.PrimaryText;
+            deleteHoverColor = theme.DangerAccentHover;
+            BackColor = isHovering ? hoverColor : startColor;
+            dragHandle.ForeColor = theme.SecondaryAccent;
+            usernameLabel.ForeColor = theme.PrimaryText;
+            editBtn.ForeColor = actionButtonColor;
+            deleteBtn.ForeColor = actionButtonColor;
         }
 
         /// <summary>
