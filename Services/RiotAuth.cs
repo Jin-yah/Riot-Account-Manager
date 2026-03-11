@@ -85,6 +85,7 @@ namespace RiotAccountManager.Services
         /// <param name="showNotification">A callback to display notifications to the user.</param>
         /// <returns>True if the client is running or was started successfully, otherwise false.</returns>
         private static async Task<bool> EnsureRiotClientRunningAsync(
+            RiotGameProduct game,
             Action<string, NotificationType> showNotification
         )
         {
@@ -129,10 +130,7 @@ namespace RiotAccountManager.Services
 
             try
             {
-                Process.Start(
-                    exePath,
-                    "--launch-product=league_of_legends --launch-patchline=live"
-                );
+                Process.Start(exePath, game.GetLaunchArguments());
             }
             catch (Exception ex)
             {
@@ -182,11 +180,12 @@ namespace RiotAccountManager.Services
         public static async Task<bool> LoginAsync(
             string username,
             string password,
+            RiotGameProduct game,
             Action<string, NotificationType> showNotification
         )
         {
             bool clientWasAlreadyRunning = Process.GetProcessesByName("Riot Client").Any();
-            if (!await EnsureRiotClientRunningAsync(showNotification))
+            if (!await EnsureRiotClientRunningAsync(game, showNotification))
                 return false;
 
             if (!clientWasAlreadyRunning)

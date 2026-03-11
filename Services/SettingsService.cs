@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace RiotAccountManager.Services
 {
@@ -23,6 +24,12 @@ namespace RiotAccountManager.Services
         /// Default is true.
         /// </summary>
         public bool CheckForUpdates { get; set; } = true;
+
+        /// <summary>
+        /// Gets or sets the last selected Riot game mode.
+        /// </summary>
+        [JsonConverter(typeof(JsonStringEnumConverter))]
+        public RiotGameProduct SelectedGame { get; set; } = RiotGameProduct.LeagueOfLegends;
     }
 
     /// <summary>

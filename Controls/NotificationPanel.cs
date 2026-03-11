@@ -1,3 +1,5 @@
+using RiotAccountManager.Services;
+
 namespace RiotAccountManager.Controls
 {
     /// <summary>
@@ -21,6 +23,12 @@ namespace RiotAccountManager.Controls
     /// </summary>
     public class NotificationPanel : Panel
     {
+        private readonly NotificationType? notificationType;
+        private readonly Button? closeButton;
+        private readonly Button? declineButton;
+        private readonly Button? confirmButton;
+        private readonly Label messageLabel;
+
         /// <summary>
         /// The timer to automatically close the notification after a set duration.
         /// </summary>
@@ -33,16 +41,12 @@ namespace RiotAccountManager.Controls
         /// <param name="type">The type of notification (Information or Error).</param>
         public NotificationPanel(string message, NotificationType type)
         {
+            notificationType = type;
             this.Height = 60;
             this.Padding = new Padding(5);
             this.Margin = new Padding(3);
 
-            this.BackColor =
-                type == NotificationType.Error
-                    ? Color.FromArgb(128, 179, 57, 57)
-                    : Color.FromArgb(128, 39, 129, 72);
-
-            var closeButton = new Button
+            closeButton = new Button
             {
                 Text = "✖",
                 Dock = DockStyle.Right,
@@ -54,7 +58,7 @@ namespace RiotAccountManager.Controls
             closeButton.FlatAppearance.BorderSize = 0;
             closeButton.Click += (s, e) => this.Dispose();
 
-            var messageLabel = new Label
+            messageLabel = new Label
             {
                 Text = message,
                 Dock = DockStyle.Fill,
@@ -67,6 +71,8 @@ namespace RiotAccountManager.Controls
 
             this.Controls.Add(messageLabel);
             this.Controls.Add(closeButton);
+
+            ApplyTheme(AppThemeManager.CurrentTheme);
 
             InitializeAutoCloseTimer();
         }
@@ -81,28 +87,25 @@ namespace RiotAccountManager.Controls
             this.Height = 60;
             this.Padding = new Padding(5);
             this.Margin = new Padding(3);
-            this.BackColor = Color.FromArgb(128, 51, 98, 166);
 
-            var declineButton = new Button
+            declineButton = new Button
             {
                 Text = "✖",
                 Dock = DockStyle.Right,
                 Width = 40,
                 FlatStyle = FlatStyle.Flat,
                 Font = new Font(this.Font.FontFamily, 10, FontStyle.Bold),
-                ForeColor = Color.FromArgb(255, 200, 200),
             };
             declineButton.FlatAppearance.BorderSize = 0;
             declineButton.Click += (s, e) => this.Dispose();
 
-            var confirmButton = new Button
+            confirmButton = new Button
             {
                 Text = "✔",
                 Dock = DockStyle.Right,
                 Width = 40,
                 FlatStyle = FlatStyle.Flat,
                 Font = new Font(this.Font.FontFamily, 10, FontStyle.Bold),
-                ForeColor = Color.FromArgb(200, 255, 200),
             };
             confirmButton.FlatAppearance.BorderSize = 0;
             confirmButton.Click += (s, e) =>
@@ -111,7 +114,7 @@ namespace RiotAccountManager.Controls
                 this.Dispose();
             };
 
-            var messageLabel = new Label
+            messageLabel = new Label
             {
                 Text = message,
                 Dock = DockStyle.Fill,
@@ -125,6 +128,45 @@ namespace RiotAccountManager.Controls
             this.Controls.Add(messageLabel);
             this.Controls.Add(declineButton);
             this.Controls.Add(confirmButton);
+
+            ApplyTheme(AppThemeManager.CurrentTheme);
+        }
+
+        public void ApplyTheme(AppTheme theme)
+        {
+            BackColor = notificationType == NotificationType.Error
+                ? theme.NotificationErrorBackground
+                : notificationType == NotificationType.Information
+                    ? theme.NotificationInfoBackground
+                    : theme.ConfirmationBackground;
+            messageLabel.ForeColor = theme.PrimaryText;
+
+            if (closeButton != null)
+            {
+                closeButton.ForeColor = theme.PrimaryText;
+                closeButton.BackColor = Color.Transparent;
+                closeButton.FlatAppearance.MouseOverBackColor = ThemeStyler.Lighten(
+                    theme.SurfaceHoverBackground,
+                    0.08
+                );
+                closeButton.FlatAppearance.MouseDownBackColor = theme.SurfaceHoverBackground;
+            }
+
+            if (declineButton != null)
+            {
+                declineButton.ForeColor = theme.ConfirmationDecline;
+                declineButton.BackColor = Color.Transparent;
+                declineButton.FlatAppearance.MouseOverBackColor = Color.FromArgb(22, theme.ConfirmationDecline);
+                declineButton.FlatAppearance.MouseDownBackColor = Color.FromArgb(38, theme.ConfirmationDecline);
+            }
+
+            if (confirmButton != null)
+            {
+                confirmButton.ForeColor = theme.ConfirmationApprove;
+                confirmButton.BackColor = Color.Transparent;
+                confirmButton.FlatAppearance.MouseOverBackColor = Color.FromArgb(22, theme.ConfirmationApprove);
+                confirmButton.FlatAppearance.MouseDownBackColor = Color.FromArgb(38, theme.ConfirmationApprove);
+            }
         }
 
         /// <summary>
