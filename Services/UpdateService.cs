@@ -6,7 +6,7 @@ namespace RiotAccountManager.Services
     {
         private const string GitHubApiUrl =
             "https://api.github.com/repos/Jin-yah/Riot-Account-Manager/releases/latest";
-        private const string CurrentVersion = "v1.5";
+        private const string CurrentVersion = "v1.6";
 
         public async Task CheckForUpdates(Form1 mainForm)
         {
